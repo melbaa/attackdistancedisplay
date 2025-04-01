@@ -1,0 +1,11 @@
+## Interface: 11200
+## Title: Attack Distance Display
+## Notes: Runtime display attack distance
+## Version: v1.0.2
+## DefaultState: enabled
+## SavedVariablesPerCharacter: add_opts
+## X-Curse-Project-ID: 351776
+
+attackdistancedisplay.lua
+
+
