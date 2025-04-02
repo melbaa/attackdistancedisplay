@@ -49,19 +49,24 @@ function ADDISPLAY:Init()
 end
 
 local function displayString(dist)
+    local r, g, b = 1, 0, 0
     if dist == nil then
         dist = 'nil'
     else
         dist = floor(dist * 100) / 100
+        if dist == 0 then
+            r, g, b = 1, 1, 1
+        end
     end
-    return "AD ".. dist
+    return "AD ".. dist, r, g, b
 end
 
 
 local function displayupdate()
     local dist = UnitXP("distanceBetween", "player", "target", "meleeAutoAttack")
-    local message = displayString(dist)
+    local message, r, g, b = displayString(dist)
     ADDISPLAY.f1.text:SetText(message)
+    ADDISPLAY.f1.text:SetTextColor(r, g, b)
 end
 
 ADDISPLAY.f1:RegisterEvent("ADDON_LOADED")
