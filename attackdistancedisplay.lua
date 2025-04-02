@@ -9,7 +9,7 @@ ADDISPLAY = {}
 -- Interface
 ADDISPLAY.f1 = CreateFrame("Frame",nil,UIParent)
 ADDISPLAY.f1:SetMovable(true)
---ADDISPLAY.f1:EnableMouse(true)
+ADDISPLAY.f1:EnableMouse(true)
 ADDISPLAY.f1:SetWidth(100) 
 ADDISPLAY.f1:SetHeight(100) 
 ADDISPLAY.f1:SetAlpha(.90);
