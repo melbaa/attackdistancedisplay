@@ -1,10 +1,10 @@
 local ADDON_NAME = "attackdistancedisplay"
 
 
-local UpdateTime, LastUpdate = 0.50, 0
+local timer_id = nil
+local timer_tick = 500  -- ms
 ADDISPLAY = {}
 
-local playerClass = string.upper(UnitClass('player'));
 
 -- Interface
 ADDISPLAY.f1 = CreateFrame("Frame",nil,UIParent)
@@ -45,53 +45,47 @@ function ADDISPLAY:Init()
     end
 
     ADDISPLAY.f1:SetPoint(add_opts.point, UIParent, add_opts.rel_point, add_opts.x_offset, add_opts.y_offset)
-end
- 
-local function displayupdate(show, message)
-    if show == 1 then
-        ADDISPLAY.f1.text:SetText(message)
-        ADDISPLAY.f1:Show()
-    elseif show == 2 then
-        ADDISPLAY.f1:Hide()
-    else
-        ADDISPLAY.f1:Hide()
-    end
+    ADDISPLAY.f1:Show()
 end
 
-local function displayString()
-    local ret = UnitXP("distanceBetween", "player", "target", "meleeAutoAttack")
-    if ret == nil then
-        ret = 'nil'
+local function displayString(dist)
+    if dist == nil then
+        dist = 'nil'
     else
-        ret = floor(ret * 10) / 10
+        dist = floor(dist * 100) / 100
     end
-    return "|cffffffff AD ".. ret
+    return "AD ".. dist
 end
 
--- f1:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
--- f1:RegisterEvent("PLAYER_TALENT_UPDATE")
--- f1:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
--- f1:RegisterEvent("PLAYER_REGEN_DISABLED")
--- f1:RegisterEvent("PLAYER_REGEN_ENABLED")
+
+local function displayupdate()
+    local dist = UnitXP("distanceBetween", "player", "target", "meleeAutoAttack")
+    local message = displayString(dist)
+    ADDISPLAY.f1.text:SetText(message)
+end
+
 ADDISPLAY.f1:RegisterEvent("ADDON_LOADED")
--- f1:RegisterEvent("PLAYER_ENTERING_WORLD")
+-- ADDISPLAY.f1:RegisterEvent("PLAYER_ENTERING_WORLD")
 -- ADDISPLAY.f1:RegisterEvent("UNIT_INVENTORY_CHANGED")
 -- ADDISPLAY.f1:RegisterEvent("UNIT_AURA")
 
-ADDISPLAY.f1:SetScript("OnUpdate", function()
-    -- arg1 is elapsed
-    LastUpdate = LastUpdate + arg1
-    if LastUpdate < UpdateTime then return end
-    displayupdate(1, displayString())
-    LastUpdate = 0
-end)
+function attackdistance_timer()
+    displayupdate()
+end
 
 ADDISPLAY.f1:SetScript("OnEvent", function()
-    displayupdate(1, displayString())
+    displayupdate()
     if event == "ADDON_LOADED" then
         if arg1 == ADDON_NAME then
             DEFAULT_CHAT_FRAME:AddMessage("|cFFF5F54A attack distance display:|r Loaded",1,1,1)
             ADDISPLAY:Init()
+            if timer_id == nil then
+                timer_id = UnitXP("timer", "arm", 0, timer_tick, "attackdistance_timer");
+            end
+        end
+    elseif event == 'PLAYER_LOGOUT' then
+        if timer_id ~= nil then
+            UnitXP("timer", "disarm", timer_id)
         end
     end
 end);
